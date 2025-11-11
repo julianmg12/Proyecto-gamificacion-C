@@ -17,10 +17,7 @@ export default function RegistroCard({ registro }) {
         <span className="registro-points">⭐ {registro.puntos} Puntos</span>
       </div>
       <div className="registro-content">
-        <strong>{registro.titulo}</strong>
-        <div>
-          <span>🧩 Gamificación</span>
-        </div>
+        <strong>🧩 {registro.titulo}</strong>
         <div style={{ marginTop: '8px', fontSize: '0.9em', color: '#444' }}>
           {registro.descripcion}
         </div>

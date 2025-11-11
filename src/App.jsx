@@ -1,30 +1,30 @@
-import { useState } from 'react';
-import Header from './components/Header';
-import RegistroCard from './components/RegistroCard';
-import AddButton from './components/AddButton';
-import NavBar from './components/NavBar';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import RegistroPage from "./pages/RegistroPage";
 
 function App() {
-  const [registro, setRegistro] = useState(null);
+  const [registros, setRegistros] = useState(() => {
+    const saved = localStorage.getItem("registros");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const agregarRegistro = () => {
-    setRegistro({
-      titulo: "Muck Ups",
-      puntos: 150,
-      descripcion: "Revisé historias de usuario - Agrupé por funcionalidad - Identifiqué flujo de navegación adecuado - Solicité primeros bocetos a la IA - Iteré para mejorar"
-    });
+  useEffect(() => {
+    localStorage.setItem("registros", JSON.stringify(registros));
+  }, [registros]);
+
+  const agregarRegistro = (nuevo) => {
+    setRegistros((prev) => [...prev, nuevo]);
   };
 
   return (
-    <>
-      <Header />
-      <main style={{ margin: '0 auto', maxWidth: '370px', minHeight: '67vh', position: 'relative' }}>
-        <h2>Mi Registro</h2>
-        <RegistroCard registro={registro} />
-        <AddButton onClick={agregarRegistro} />
-      </main>
-      <NavBar />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home registros={registros} />} />
+        <Route path="/registro" element={<RegistroPage onRegistrar={agregarRegistro} />} />
+      </Routes>
+    </Router>
   );
 }
 
