@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import AddButton from "../components/AddButton";
 import NavBar from "../components/NavBar";
 import { getXPForRegistro } from "../utils/gamification";
+import ProgressBar from "../components/Progress";
 
 // Agrupa registros por día
 const agruparPorDia = (registros) => {
@@ -44,6 +45,33 @@ export default function Home({ registros = [], stats }) {
           margin: "0 auto",
         }}
       >
+        {/* 🔥 Barra de progreso general del estudiante */}
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1rem",
+            background: "#faf6ff",
+            borderRadius: "14px",
+            border: "1px solid #e4d9ff",
+            textAlign: "center",
+          }}
+        >
+          <h2
+            style={{
+              margin: "0 0 10px 0",
+              fontSize: "1.2rem",
+              color: "#2a007f",
+              fontWeight: "700",
+            }}
+          >
+            Progreso del Estudiante
+          </h2>
+
+          <div style={{ width: "85%", margin: "0 auto" }}>
+            <ProgressBar />
+          </div>
+        </div>
+
         {/* Resumen de progreso */}
         <section
           style={{
@@ -73,6 +101,7 @@ export default function Home({ registros = [], stats }) {
               fontSize: "0.9rem",
             }}
           >
+            {/* XP semanal */}
             <div
               style={{
                 flex: "1 1 120px",
@@ -108,6 +137,7 @@ export default function Home({ registros = [], stats }) {
               </div>
             </div>
 
+            {/* Racha */}
             <div
               style={{
                 flex: "1 1 120px",
@@ -125,6 +155,7 @@ export default function Home({ registros = [], stats }) {
               </div>
             </div>
 
+            {/* Registros totales */}
             <div
               style={{
                 flex: "1 1 120px",
@@ -174,7 +205,13 @@ export default function Home({ registros = [], stats }) {
                   {fecha}
                 </h3>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.4rem",
+                  }}
+                >
                   {registrosAgrupados[fecha].map((registro, index) => {
                     const globalIndex = `${fecha}-${index}`;
                     const xp = getXPForRegistro(registro);
@@ -304,3 +341,5 @@ export default function Home({ registros = [], stats }) {
     </>
   );
 }
+
+
