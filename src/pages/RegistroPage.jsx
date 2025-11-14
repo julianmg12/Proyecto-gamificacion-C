@@ -26,7 +26,7 @@ export default function RegistroPage({ onRegistrar }) {
     };
 
     onRegistrar(registroNuevo);
-    navigate("/");
+    navigate("/home");
   };
 
   return (
