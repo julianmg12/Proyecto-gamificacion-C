@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import Header from "../components/Header";
 import AddButton from "../components/AddButton";
 import NavBar from "../components/NavBar";
+import { getXPForRegistro } from "../utils/gamification";
 
-// Función para agrupar registros por fecha (día)
+// Agrupa registros por día
 const agruparPorDia = (registros) => {
   return registros.reduce((acc, reg) => {
     const fecha = new Date(reg.fecha).toLocaleDateString();
@@ -15,168 +15,287 @@ const agruparPorDia = (registros) => {
   }, {});
 };
 
-export default function Home({ registros }) {
+export default function Home({ registros = [], stats }) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(null);
 
-  const toggleExpand = (index) => {
-    setExpanded(expanded === index ? null : index);
+  const toggleExpand = (id) => {
+    setExpanded(expanded === id ? null : id);
   };
 
-  const obtenerEmojiDificultad = (valor) => {
-    if (valor < 20) return "😴";
-    if (valor < 40) return "🙂";
-    if (valor < 60) return "😐";
-    if (valor < 80) return "😰";
-    return "🤯";
-  };
+  const registrosAgrupados = agruparPorDia(registros);
 
-  const registrosAgrupados = agruparPorDia(registros || []);
+  const weeklyPercent =
+    stats?.targetWeeklyXP && stats.targetWeeklyXP > 0
+      ? Math.min(
+          100,
+          Math.round((stats.weeklyXP / stats.targetWeeklyXP) * 100)
+        )
+      : 0;
 
   return (
     <>
-      <Header />
+      <Header stats={stats} />
 
       <main
         style={{
+          padding: "1rem 1.5rem 4rem",
+          maxWidth: "900px",
           margin: "0 auto",
-          maxWidth: "370px",
-          minHeight: "67vh",
-          position: "relative",
-          padding: "16px",
         }}
       >
-        <h2 style={{ marginBottom: "18px" }}>Mi Registro</h2>
-
-        {!registros || registros.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#666" }}>
-            Aún no hay avances registrados.
-          </p>
-        ) : (
-          <div
+        {/* Resumen de progreso */}
+        <section
+          style={{
+            marginBottom: "1.2rem",
+            padding: "1rem",
+            borderRadius: "12px",
+            background: "#f7f3ff",
+            border: "1px solid #e0d5ff",
+          }}
+        >
+          <h2
             style={{
-              position: "relative",
-              marginLeft: "20px",
-              paddingLeft: "20px",
-              borderLeft: "2px solid #ccc",
+              marginTop: 0,
+              marginBottom: "0.6rem",
+              fontSize: "1.1rem",
+              color: "#2a007f",
             }}
           >
-            {Object.keys(registrosAgrupados).map((fecha) => (
-              <div key={fecha} style={{ marginBottom: "24px" }}>
+            Progreso de estudio 📈
+          </h2>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0.8rem",
+              fontSize: "0.9rem",
+            }}
+          >
+            <div
+              style={{
+                flex: "1 1 120px",
+                background: "#fff",
+                borderRadius: "10px",
+                padding: "0.6rem 0.8rem",
+                border: "1px solid #eadfff",
+              }}
+            >
+              <div style={{ color: "#6b5a9f", fontSize: "0.8rem" }}>
+                XP semanal
+              </div>
+              <div style={{ fontWeight: 700, color: "#2a007f" }}>
+                {stats?.weeklyXP ?? 0} / {stats?.targetWeeklyXP ?? 0}
+              </div>
+              <div
+                style={{
+                  marginTop: "0.4rem",
+                  height: "6px",
+                  borderRadius: "999px",
+                  background: "#e1d6ff",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${weeklyPercent}%`,
+                    height: "100%",
+                    background: "#6541b5",
+                    transition: "width 0.3s",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                flex: "1 1 120px",
+                background: "#fff",
+                borderRadius: "10px",
+                padding: "0.6rem 0.8rem",
+                border: "1px solid #eadfff",
+              }}
+            >
+              <div style={{ color: "#6b5a9f", fontSize: "0.8rem" }}>
+                Racha actual
+              </div>
+              <div style={{ fontWeight: 700, color: "#2a007f" }}>
+                {stats?.streakDays ?? 0} días 🔥
+              </div>
+            </div>
+
+            <div
+              style={{
+                flex: "1 1 120px",
+                background: "#fff",
+                borderRadius: "10px",
+                padding: "0.6rem 0.8rem",
+                border: "1px solid #eadfff",
+              }}
+            >
+              <div style={{ color: "#6b5a9f", fontSize: "0.8rem" }}>
+                Registros totales
+              </div>
+              <div style={{ fontWeight: 700, color: "#2a007f" }}>
+                {stats?.totalRegistros ?? 0}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Lista de registros */}
+        <section>
+          <h2
+            style={{
+              fontSize: "1.1rem",
+              marginBottom: "0.6rem",
+              color: "#2a007f",
+            }}
+          >
+            Mi registro
+          </h2>
+
+          {!registros || registros.length === 0 ? (
+            <p style={{ fontSize: "0.95rem", color: "#5f4b8b" }}>
+              Aún no hay avances registrados. Usa el botón <strong>+</strong> para
+              empezar tu primera racha. 💪
+            </p>
+          ) : (
+            Object.keys(registrosAgrupados).map((fecha) => (
+              <div key={fecha} style={{ marginBottom: "1rem" }}>
                 <h3
                   style={{
-                    fontSize: "14px",
-                    color: "#555",
-                    marginBottom: "12px",
-                    fontWeight: "600",
+                    fontSize: "0.95rem",
+                    marginBottom: "0.4rem",
+                    color: "#4a3b7a",
                   }}
                 >
                   {fecha}
                 </h3>
 
-                {registrosAgrupados[fecha].map((registro, index) => {
-                  const dificultad = registro.dificultad ?? 30;
-                  const emoji =
-                    registro.emojiDificultad ??
-                    obtenerEmojiDificultad(dificultad);
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                  {registrosAgrupados[fecha].map((registro, index) => {
+                    const globalIndex = `${fecha}-${index}`;
+                    const xp = getXPForRegistro(registro);
 
-                  const globalIndex = `${fecha}-${index}`;
-
-                  return (
-                    <div
-                      key={globalIndex}
-                      style={{ marginBottom: "20px", position: "relative" }}
-                    >
+                    return (
                       <div
-                        style={{
-                          position: "absolute",
-                          left: "-11px",
-                          top: "14px",
-                          width: "14px",
-                          height: "14px",
-                          backgroundColor: "#6541b5",
-                          borderRadius: "50%",
-                          border: "2px solid white",
-                        }}
-                      />
-
-                      <div
+                        key={globalIndex}
                         onClick={() => toggleExpand(globalIndex)}
                         style={{
-                          padding: "12px",
+                          padding: "10px 12px",
                           backgroundColor: "#f3f3f3",
                           borderRadius: "10px",
                           border: "1px solid #ddd",
                           cursor: "pointer",
                           display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                          flexDirection: "column",
+                          gap: "0.3rem",
+                          boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                         }}
                       >
-                        <span style={{ fontWeight: "600", fontSize: "0.95rem" }}>
-                          {registro.proyecto || registro.titulo || "Sin título"}
-                        </span>
-                        <span style={{ fontSize: "1.4rem" }}>{emoji}</span>
-                      </div>
-
-                      <AnimatePresence initial={false}>
-                        {expanded === globalIndex && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.28 }}
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          <div
                             style={{
-                              marginTop: "10px",
-                              padding: "14px",
-                              backgroundColor: "white",
-                              borderRadius: "10px",
-                              border: "1px solid #ccc",
-                              boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
-                              overflow: "hidden",
+                              fontWeight: 600,
+                              fontSize: "0.95rem",
+                              color: "#222",
+                            }}
+                          >
+                            {registro.proyecto || registro.titulo || "Sin título"}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "0.8rem",
+                              color: "#6541b5",
+                              fontWeight: 600,
+                            }}
+                          >
+                            +{xp} XP
+                          </div>
+                        </div>
+
+                        {expanded === globalIndex && (
+                          <div
+                            style={{
+                              marginTop: "0.3rem",
+                              fontSize: "0.85rem",
+                              color: "#444",
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "0.2rem",
                             }}
                           >
                             {registro.curso && (
-                              <p>
+                              <div>
                                 <strong>Curso:</strong> {registro.curso}
-                              </p>
+                              </div>
                             )}
+
                             {registro.descripcion && (
-                              <p>
+                              <div>
                                 <strong>Qué hice:</strong> {registro.descripcion}
-                              </p>
+                              </div>
                             )}
+
                             {registro.comoHice && (
-                              <p>
+                              <div>
                                 <strong>Cómo lo hice:</strong> {registro.comoHice}
-                              </p>
+                              </div>
                             )}
+
                             {registro.recurso && (
-                              <p>
+                              <div>
                                 <strong>Recurso:</strong>{" "}
                                 <a
                                   href={registro.recurso}
                                   target="_blank"
                                   rel="noreferrer"
+                                  style={{ color: "#6541b5" }}
                                 >
                                   {registro.recurso}
                                 </a>
-                              </p>
+                              </div>
                             )}
-                            <p>
-                              <strong>Dificultad:</strong> {dificultad}% {emoji}
-                            </p>
-                          </motion.div>
+
+                            <div>
+                              <strong>Dificultad:</strong>{" "}
+                              {registro.dificultad ?? 0}%
+                            </div>
+                            <div>
+                              <strong>Tiempo invertido:</strong>{" "}
+                              {registro.tiempo ?? 0} h
+                            </div>
+                            <div>
+                              <strong>Comprensión:</strong>{" "}
+                              {registro.comprension ?? 0}%
+                            </div>
+                            <div>
+                              <strong>Recurso externo:</strong>{" "}
+                              {registro.usoRecurso ? "Sí" : "No"}
+                            </div>
+                            <div>
+                              <strong>Trabajo en grupo:</strong>{" "}
+                              {registro.trabajoGrupo ? "Sí" : "No"}
+                            </div>
+                          </div>
                         )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </section>
 
         <AddButton onClick={() => navigate("/registro")} />
       </main>

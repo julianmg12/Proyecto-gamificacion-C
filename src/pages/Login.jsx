@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn, signUp } from "../firebase/auth";
@@ -31,6 +30,13 @@ export default function Login() {
     }
   };
 
+  
+  const heroTitle = isSignIn ? "¡Bienvenido de nuevo!" : "¡Únete a nosotros!";
+  const heroText = isSignIn
+    ? "Accede a tu cuenta para continuar."
+    : "Crea una cuenta y comienza ahora.";
+  const heroImage = isSignIn ? signinImg : signupImg;
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -40,24 +46,11 @@ export default function Login() {
             <img src={logo} alt="Logo" />
           </div>
 
-          <div
-            className="hero-wrapper"
-            style={{
-              transform: isSignIn ? "translateY(0%)" : "translateY(-50%)",
-              transition: "transform 0.5s ease-in-out",
-            }}
-          >
-            <div className="hero-section">
-              <h2>¡Bienvenido de nuevo!</h2>
-              <p>Accede a tu cuenta para continuar.</p>
-              <img src={signinImg} alt="Sign In" />
-            </div>
-
-            <div className="hero-section">
-              <h2>¡Únete a nosotros!</h2>
-              <p>Crea una cuenta y comienza ahora.</p>
-              <img src={signupImg} alt="Sign Up" />
-            </div>
+          {/* 🔥 SOLO UNA sección, cambia según isSignIn */}
+          <div className="hero-section">
+            <h2>{heroTitle}</h2>
+            <p>{heroText}</p>
+            <img src={heroImage} alt={isSignIn ? "Sign In" : "Sign Up"} />
           </div>
 
           <div className="nav-buttons">
