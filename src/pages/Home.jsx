@@ -15,6 +15,15 @@ const agruparPorDia = (registros) => {
   }, {});
 };
 
+// Recuperar emoji por dificultad
+const obtenerEmojiDificultad = (valor = 50) => {
+  if (valor < 20) return "😴";
+  if (valor < 40) return "🙂";
+  if (valor < 60) return "😐";
+  if (valor < 80) return "😰";
+  return "🤯";
+};
+
 export default function Home({ registros = [], stats }) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(null);
@@ -24,14 +33,6 @@ export default function Home({ registros = [], stats }) {
   };
 
   const registrosAgrupados = agruparPorDia(registros);
-
-  const weeklyPercent =
-    stats?.targetWeeklyXP && stats.targetWeeklyXP > 0
-      ? Math.min(
-          100,
-          Math.round((stats.weeklyXP / stats.targetWeeklyXP) * 100)
-        )
-      : 0;
 
   return (
     <>
@@ -44,16 +45,18 @@ export default function Home({ registros = [], stats }) {
           margin: "0 auto",
         }}
       >
-        {/* ✅ SOLO RESUMEN DE PROGRESO, SIN LA BARRA GENERAL */}
+        {/* ❌❌❌ ELIMINADO: Barra de Progreso del Estudiante ❌❌❌ */}
+        {/* COMPLETAMENTE BORRADO POR PETICIÓN */}
 
-        {/* Resumen de progreso */}
+
+        {/* Resumen de progreso (SE MANTIENE IGUAL) */}
         <section
           style={{
             marginBottom: "1.2rem",
             padding: "1rem",
             borderRadius: "12px",
             background: "#f7f3ff",
-            border: "1px solid #eadfff",
+            border: "1px solid #e0d5ff",
           }}
         >
           <h2
@@ -102,7 +105,16 @@ export default function Home({ registros = [], stats }) {
               >
                 <div
                   style={{
-                    width: `${weeklyPercent}%`,
+                    width: `${
+                      stats?.targetWeeklyXP
+                        ? Math.min(
+                            100,
+                            Math.round(
+                              (stats.weeklyXP / stats.targetWeeklyXP) * 100
+                            )
+                          )
+                        : 0
+                    }%`,
                     height: "100%",
                     background: "#6541b5",
                     transition: "width 0.3s",
@@ -118,7 +130,7 @@ export default function Home({ registros = [], stats }) {
                 background: "#fff",
                 borderRadius: "10px",
                 padding: "0.6rem 0.8rem",
-                border: "1px solid #eadfff", // ✅ corregido
+                border: "1px solid #eadfff",
               }}
             >
               <div style={{ color: "#6b5a9f", fontSize: "0.8rem" }}>
@@ -190,6 +202,11 @@ export default function Home({ registros = [], stats }) {
                     const globalIndex = `${fecha}-${index}`;
                     const xp = getXPForRegistro(registro);
 
+                    // 🔧 RESTAURAR EMOJI
+                    const emoji = obtenerEmojiDificultad(
+                      registro.dificultad ?? 50
+                    );
+
                     return (
                       <div
                         key={globalIndex}
@@ -206,6 +223,7 @@ export default function Home({ registros = [], stats }) {
                           boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                         }}
                       >
+                        {/* 🔧 TÍTULO + EMOJI RESTAURADO */}
                         <div
                           style={{
                             display: "flex",
@@ -219,10 +237,17 @@ export default function Home({ registros = [], stats }) {
                               fontWeight: 600,
                               fontSize: "0.95rem",
                               color: "#222",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
                             }}
                           >
-                            {registro.proyecto || registro.titulo || "Sin título"}
+                            {emoji}{" "}
+                            {registro.proyecto ||
+                              registro.titulo ||
+                              "Sin título"}
                           </div>
+
                           <div
                             style={{
                               fontSize: "0.8rem",
