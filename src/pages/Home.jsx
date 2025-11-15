@@ -4,7 +4,6 @@ import Header from "../components/Header";
 import AddButton from "../components/AddButton";
 import NavBar from "../components/NavBar";
 import { getXPForRegistro } from "../utils/gamification";
-import ProgressBar from "../components/Progress";
 
 // Agrupa registros por día
 const agruparPorDia = (registros) => {
@@ -45,32 +44,7 @@ export default function Home({ registros = [], stats }) {
           margin: "0 auto",
         }}
       >
-        {/* 🔥 Barra de progreso general del estudiante */}
-        <div
-          style={{
-            marginBottom: "1.5rem",
-            padding: "1rem",
-            background: "#faf6ff",
-            borderRadius: "14px",
-            border: "1px solid #e4d9ff",
-            textAlign: "center",
-          }}
-        >
-          <h2
-            style={{
-              margin: "0 0 10px 0",
-              fontSize: "1.2rem",
-              color: "#2a007f",
-              fontWeight: "700",
-            }}
-          >
-            Progreso del Estudiante
-          </h2>
-
-          <div style={{ width: "85%", margin: "0 auto" }}>
-            <ProgressBar />
-          </div>
-        </div>
+        {/* ✅ SOLO RESUMEN DE PROGRESO, SIN LA BARRA GENERAL */}
 
         {/* Resumen de progreso */}
         <section
@@ -79,7 +53,7 @@ export default function Home({ registros = [], stats }) {
             padding: "1rem",
             borderRadius: "12px",
             background: "#f7f3ff",
-            border: "1px solid #e0d5ff",
+            border: "1px solid #eadfff",
           }}
         >
           <h2
@@ -144,7 +118,7 @@ export default function Home({ registros = [], stats }) {
                 background: "#fff",
                 borderRadius: "10px",
                 padding: "0.6rem 0.8rem",
-                border: "1px solid #eadfff",
+                border: "1px solid #eadfff", // ✅ corregido
               }}
             >
               <div style={{ color: "#6b5a9f", fontSize: "0.8rem" }}>
@@ -341,5 +315,3 @@ export default function Home({ registros = [], stats }) {
     </>
   );
 }
-
-
