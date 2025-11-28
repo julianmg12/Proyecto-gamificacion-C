@@ -62,6 +62,13 @@ export default function NavBar() {
       >
         Social
       </NavLink>
+
+      <NavLink
+        to="/graficos"
+        style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
+      >
+        Rendimiento
+      </NavLink>
     </nav>
   );
 }
