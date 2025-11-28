@@ -348,6 +348,7 @@ export default function SocialPage({ registros = [] }) {
                             background: "#f8f6ff",
                             border: "1px solid #ece5ff",
                             transition: "all 0.2s",
+                            minWidth: 0,
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.background = "#ede5ff";
@@ -373,8 +374,8 @@ export default function SocialPage({ registros = [] }) {
                           >
                             {c.author?.charAt(0).toUpperCase() || "C"}
                           </div>
-                          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.25rem", minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
                               <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#2a007f" }}>
                                 {c.author || "Anónimo"}
                               </span>
@@ -382,7 +383,7 @@ export default function SocialPage({ registros = [] }) {
                                 {getTimeAgo(c.timestamp)}
                               </span>
                             </div>
-                            <p style={{ margin: 0, fontSize: "0.8rem", color: "#4a3b7a", lineHeight: 1.4 }}>
+                            <p style={{ margin: 0, fontSize: "0.8rem", color: "#4a3b7a", lineHeight: 1.4, wordBreak: "break-word", overflowWrap: "break-word" }}>
                               {c.text}
                             </p>
                           </div>
