@@ -16,6 +16,7 @@ import SocialPage from "./pages/SocialPage";
 import { calculateStats } from "./utils/gamification";
 import NotificationProvider from "./components/NotificationProvider";
 import StatsNotifier from "./components/StatsNotifier";
+import GraficosPage from "./pages/GraficosPage";
 
 function App() {
   // Registros guardados en localStorage
@@ -70,6 +71,8 @@ function App() {
             path="/social"
             element={<SocialPage registros={registros} />}
           />
+
+          <Route path="/graficos" element={<GraficosPage />} />
 
           {/* Cualquier otra ruta incorrecta vuelve al login */}
           <Route path="*" element={<Navigate to="/login" replace />} />

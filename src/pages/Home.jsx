@@ -4,7 +4,6 @@ import Header from "../components/Header";
 import AddButton from "../components/AddButton";
 import NavBar from "../components/NavBar";
 import { getXPForRegistro } from "../utils/gamification";
-import ProgressBar from "../components/Progress";
 
 // Agrupa registros por día
 const agruparPorDia = (registros) => {
@@ -14,6 +13,15 @@ const agruparPorDia = (registros) => {
     acc[fecha].push(reg);
     return acc;
   }, {});
+};
+
+// Recuperar emoji por dificultad
+const obtenerEmojiDificultad = (valor = 50) => {
+  if (valor < 20) return "😴";
+  if (valor < 40) return "🙂";
+  if (valor < 60) return "😐";
+  if (valor < 80) return "😰";
+  return "🤯";
 };
 
 export default function Home({ registros = [], stats }) {
@@ -26,14 +34,6 @@ export default function Home({ registros = [], stats }) {
 
   const registrosAgrupados = agruparPorDia(registros);
 
-  const weeklyPercent =
-    stats?.targetWeeklyXP && stats.targetWeeklyXP > 0
-      ? Math.min(
-          100,
-          Math.round((stats.weeklyXP / stats.targetWeeklyXP) * 100)
-        )
-      : 0;
-
   return (
     <>
       <Header stats={stats} />
@@ -45,34 +45,11 @@ export default function Home({ registros = [], stats }) {
           margin: "0 auto",
         }}
       >
-        {/* 🔥 Barra de progreso general del estudiante */}
-        <div
-          style={{
-            marginBottom: "1.5rem",
-            padding: "1rem",
-            background: "#faf6ff",
-            borderRadius: "14px",
-            border: "1px solid #e4d9ff",
-            textAlign: "center",
-          }}
-        >
-          <h2
-            style={{
-              margin: "0 0 10px 0",
-              fontSize: "1.2rem",
-              color: "#2a007f",
-              fontWeight: "700",
-            }}
-          >
-            Progreso del Estudiante
-          </h2>
+        {/* ❌❌❌ ELIMINADO: Barra de Progreso del Estudiante ❌❌❌ */}
+        {/* COMPLETAMENTE BORRADO POR PETICIÓN */}
 
-          <div style={{ width: "85%", margin: "0 auto" }}>
-            <ProgressBar />
-          </div>
-        </div>
 
-        {/* Resumen de progreso */}
+        {/* Resumen de progreso (SE MANTIENE IGUAL) */}
         <section
           style={{
             marginBottom: "1.2rem",
@@ -128,7 +105,16 @@ export default function Home({ registros = [], stats }) {
               >
                 <div
                   style={{
-                    width: `${weeklyPercent}%`,
+                    width: `${
+                      stats?.targetWeeklyXP
+                        ? Math.min(
+                            100,
+                            Math.round(
+                              (stats.weeklyXP / stats.targetWeeklyXP) * 100
+                            )
+                          )
+                        : 0
+                    }%`,
                     height: "100%",
                     background: "#6541b5",
                     transition: "width 0.3s",
@@ -216,6 +202,11 @@ export default function Home({ registros = [], stats }) {
                     const globalIndex = `${fecha}-${index}`;
                     const xp = getXPForRegistro(registro);
 
+                    // 🔧 RESTAURAR EMOJI
+                    const emoji = obtenerEmojiDificultad(
+                      registro.dificultad ?? 50
+                    );
+
                     return (
                       <div
                         key={globalIndex}
@@ -232,6 +223,7 @@ export default function Home({ registros = [], stats }) {
                           boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                         }}
                       >
+                        {/* 🔧 TÍTULO + EMOJI RESTAURADO */}
                         <div
                           style={{
                             display: "flex",
@@ -245,10 +237,17 @@ export default function Home({ registros = [], stats }) {
                               fontWeight: 600,
                               fontSize: "0.95rem",
                               color: "#222",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
                             }}
                           >
-                            {registro.proyecto || registro.titulo || "Sin título"}
+                            {emoji}{" "}
+                            {registro.proyecto ||
+                              registro.titulo ||
+                              "Sin título"}
                           </div>
+
                           <div
                             style={{
                               fontSize: "0.8rem",
@@ -341,5 +340,3 @@ export default function Home({ registros = [], stats }) {
     </>
   );
 }
-
-
