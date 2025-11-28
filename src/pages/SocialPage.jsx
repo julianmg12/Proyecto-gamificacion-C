@@ -1,17 +1,25 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import NavBar from "../components/NavBar";
 
 export default function SocialPage({ registros = [] }) {
   const [likes, setLikes] = useState({});
-  const [comments, setComments] = useState({});
+  const [comments, setComments] = useState(() => {
+    const saved = localStorage.getItem("socialComments");
+    return saved ? JSON.parse(saved) : {};
+  });
   const [commentInput, setCommentInput] = useState({});
   const [likedPosts, setLikedPosts] = useState({});
 
   const sorted = [...registros].sort(
     (a, b) => new Date(b.fecha) - new Date(a.fecha)
   );
+
+  // Guardar comentarios en localStorage cada vez que cambien
+  useEffect(() => {
+    localStorage.setItem("socialComments", JSON.stringify(comments));
+  }, [comments]);
 
   const handleLike = (idx) => {
     setLikes((prev) => ({
