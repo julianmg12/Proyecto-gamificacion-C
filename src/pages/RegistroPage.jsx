@@ -1,187 +1,172 @@
-import { useState } from "react";
+// src/pages/RegistroPage.jsx
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 
-export default function RegistroPage({ onRegistrar }) {
+const BRAND = {
+  primary: "#6541b5",
+  lightPrimary: "#f2eefc",
+  cardBg: "#fff",
+  pageBg: "#faf8ff",
+};
+
+function computeXP({ tiempo = 0, dificultad = 50, comprension = 50, trabajoGrupo = false }) {
+  const base = 10;
+  const timeFactor = Math.max(0, Number(tiempo)) * 5;
+  const diffFactor = (Number(dificultad) || 0) * 0.4;
+  const compFactor = (Number(comprension) || 0) * 0.2;
+  const groupBonus = trabajoGrupo ? 12 : 0;
+  const total = Math.round(base + timeFactor + diffFactor + compFactor + groupBonus);
+  return total;
+}
+
+export default function RegistroPage({ onRegistrar } = {}) {
   const navigate = useNavigate();
-
-  const [curso, setCurso] = useState("");
-  const [proyecto, setProyecto] = useState("");
-  const [queHice, setQueHice] = useState("");
-  const [comoHice, setComoHice] = useState("");
-  const [recurso, setRecurso] = useState("");
-
-  const [dificultad, setDificultad] = useState(50);
-  const [tiempo, setTiempo] = useState(1);
-  const [comprension, setComprension] = useState(50);
-  const [usoRecurso, setUsoRecurso] = useState(false);
-  const [trabajoGrupo, setTrabajoGrupo] = useState(false);
-
-  const [step, setStep] = useState(0);
-
-  const totalSteps = 7;
-
-  const obtenerEmojiDificultad = (valor) => {
-    if (valor < 20) return "😴";
-    if (valor < 40) return "🙂";
-    if (valor < 60) return "😐";
-    if (valor < 80) return "😰";
-    return "🤯";
-  };
-
-  const emojiActual = obtenerEmojiDificultad(dificultad);
-  const formValido = curso && proyecto && queHice;
-
-  const handleNext = () => step < totalSteps - 1 && setStep(step + 1);
-  const handlePrev = () => step > 0 && setStep(step - 1);
-
-  const handleSubmit = () => {
-    const registroNuevo = {
-      titulo: proyecto,
-      curso,
-      proyecto,
-      descripcion: queHice,
-      comoHice: comoHice || "",
-      recurso: recurso || "",
-      dificultad,
-      emojiDificultad: obtenerEmojiDificultad(dificultad),
-      tiempo,
-      comprension,
-      usoRecurso,
-      trabajoGrupo,
-      fecha: new Date().toISOString(),
-    };
-    onRegistrar(registroNuevo);
-    navigate("/home");
-  };
-
-  const buttonStyle = {
-    padding: "10px 16px",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: "600",
-    fontSize: "0.95rem",
-    flex: 1,
-    transition: "0.2s",
-  };
-
-  const nextButtonStyle = (enabled) => ({
-    ...buttonStyle,
-    backgroundColor: enabled ? "#6541b5" : "#ccc",
-    color: "#fff",
+  const [form, setForm] = useState({
+    titulo: "",
+    proyecto: "",
+    curso: "",
+    descripcion: "",
+    comoHice: "",
+    recurso: "",
+    dificultad: 50,
+    tiempo: 1,
+    comprension: 50,
+    usoRecurso: false,
+    trabajoGrupo: false,
+    fecha: new Date().toISOString().slice(0, 10),
   });
 
-  const prevButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: "#eee",
-    color: "#333",
+  const [xp, setXp] = useState(() => computeXP(form));
+  const [savedMsg, setSavedMsg] = useState("");
+
+  useEffect(() => {
+    setXp(computeXP(form));
+  }, [form]);
+
+  const onChange = (k, v) => setForm((s) => ({ ...s, [k]: v }));
+
+  const guardarRegistro = () => {
+    if (!form.titulo.trim() && !form.descripcion.trim()) {
+      setSavedMsg("Añade un título o una descripción para guardar el avance.");
+      return;
+    }
+
+    const nuevo = {
+      ...form,
+      xpGained: xp,
+      fecha: form.fecha || new Date().toISOString().slice(0, 10),
+      id: Date.now(),
+    };
+
+    // guarda en localStorage (compatibilidad con el resto)
+    const existentes = JSON.parse(localStorage.getItem("registros") || "[]");
+    existentes.unshift(nuevo);
+    localStorage.setItem("registros", JSON.stringify(existentes));
+
+    // NOTA IMPORTANTE: llama onRegistrar si fue pasada por props
+    if (typeof onRegistrar === "function") {
+      try {
+        onRegistrar(nuevo);
+      } catch (e) {
+        // no bloquear si falla
+        console.warn("onRegistrar callback failed", e);
+      }
+    }
+
+    setSavedMsg("Registro guardado ✅");
+    setTimeout(() => {
+      setSavedMsg("");
+      navigate("/home");
+    }, 700);
   };
 
-
-  const campoVariants = {
-    initial: { x: 50, opacity: 0 },
-    animate: { x: 0, opacity: 1 },
-    exit: { x: -50, opacity: 0 },
-  };
+  const resetForm = () =>
+    setForm({
+      titulo: "",
+      proyecto: "",
+      curso: "",
+      descripcion: "",
+      comoHice: "",
+      recurso: "",
+      dificultad: 50,
+      tiempo: 1,
+      comprension: 50,
+      usoRecurso: false,
+      trabajoGrupo: false,
+      fecha: new Date().toISOString().slice(0, 10),
+    });
 
   return (
-    <main style={{ margin: "0 auto", maxWidth: "370px", padding: "16px", minHeight: "67vh", display: "flex", flexDirection: "column", gap: "12px" }}>
-      <h2 style={{ marginBottom: "12px", fontSize: "1.3rem", fontWeight: "bold" }}>Registrar avance</h2>
+    <div style={{ background: BRAND.pageBg, minHeight: "100vh", paddingBottom: 120 }}>
+      <div style={{ maxWidth: 980, margin: "18px auto", padding: 20 }}>
+        <h2 style={{ color: "#2a007f" }}>Registrar actividad</h2>
 
-      <AnimatePresence exitBeforeEnter>
-        {step === 0 && (
-          <motion.div key={0} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>Curso</label>
-            <input type="text" placeholder="Ingresa el curso" value={curso} onChange={(e) => setCurso(e.target.value)} style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }} />
-            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-              <button disabled={!curso} onClick={handleNext} style={nextButtonStyle(!!curso)}>Siguiente</button>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20 }}>
+          <div style={{ background: "#fff", padding: 16, borderRadius: 12 }}>
+            <h3>Datos básicos</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <input placeholder="Título" value={form.titulo} onChange={(e) => onChange("titulo", e.target.value)} style={{ padding: 10, borderRadius: 8, border: "1px solid #eee" }} />
+              <input placeholder="Proyecto/etiqueta" value={form.proyecto} onChange={(e) => onChange("proyecto", e.target.value)} style={{ padding: 10, borderRadius: 8, border: "1px solid #eee" }} />
+              <input placeholder="Curso (opcional)" value={form.curso} onChange={(e) => onChange("curso", e.target.value)} style={{ padding: 10, borderRadius: 8, border: "1px solid #eee" }} />
+              <input type="date" value={form.fecha} onChange={(e) => onChange("fecha", e.target.value)} style={{ padding: 10, borderRadius: 8, border: "1px solid #eee" }} />
             </div>
-          </motion.div>
-        )}
 
-        {step === 1 && (
-          <motion.div key={1} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>Proyecto/Tarea</label>
-            <input type="text" placeholder="Nombre del proyecto o tarea" value={proyecto} onChange={(e) => setProyecto(e.target.value)} style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }} />
-            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-              <button onClick={handlePrev} style={prevButtonStyle}>Atrás</button>
-              <button disabled={!proyecto} onClick={handleNext} style={nextButtonStyle(!!proyecto)}>Siguiente</button>
+            <h3 style={{ marginTop: 12 }}>Qué hice / Cómo lo hice</h3>
+            <textarea rows={3} placeholder="Qué hiciste..." value={form.descripcion} onChange={(e) => onChange("descripcion", e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #eee" }} />
+            <textarea rows={2} placeholder="Cómo lo hiciste..." value={form.comoHice} onChange={(e) => onChange("comoHice", e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #eee", marginTop: 8 }} />
+
+            <h3 style={{ marginTop: 12 }}>Recursos</h3>
+            <input placeholder="URL recurso (opcional)" value={form.recurso} onChange={(e) => onChange("recurso", e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #eee" }} />
+            <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <input type="checkbox" checked={form.usoRecurso} onChange={(e) => onChange("usoRecurso", e.target.checked)} />
+                Usé recurso externo
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <input type="checkbox" checked={form.trabajoGrupo} onChange={(e) => onChange("trabajoGrupo", e.target.checked)} />
+                Trabajo en grupo
+              </label>
             </div>
-          </motion.div>
-        )}
+          </div>
 
-        {step === 2 && (
-          <motion.div key={2} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>¿Qué hice?</label>
-            <textarea placeholder="Describe lo que hiciste" value={queHice} onChange={(e) => setQueHice(e.target.value)} style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ccc", minHeight: "80px" }} />
-            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-              <button onClick={handlePrev} style={prevButtonStyle}>Atrás</button>
-              <button disabled={!queHice} onClick={handleNext} style={nextButtonStyle(!!queHice)}>Siguiente</button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === 3 && (
-          <motion.div key={3} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>¿Cómo lo hice? (Opcional)</label>
-            <textarea placeholder="Describe el proceso" value={comoHice} onChange={(e) => setComoHice(e.target.value)} style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ccc", minHeight: "80px" }} />
-            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-              <button onClick={handlePrev} style={prevButtonStyle}>Atrás</button>
-              <button onClick={handleNext} style={nextButtonStyle(true)}>Siguiente</button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === 4 && (
-          <motion.div key={4} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>Recurso / Link (Opcional)</label>
-            <input type="text" placeholder="Incluye un enlace" value={recurso} onChange={(e) => setRecurso(e.target.value)} style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }} />
-            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-              <button onClick={handlePrev} style={prevButtonStyle}>Atrás</button>
-              <button onClick={handleNext} style={nextButtonStyle(true)}>Siguiente</button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === 5 && (
-          <motion.div key={5} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>Dificultad del proyecto: {emojiActual} {dificultad}%</label>
-            <input type="range" min="0" max="100" value={dificultad} onChange={(e) => setDificultad(Number(e.target.value))} style={{ width: "100%", cursor: "pointer" }} />
-            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-              <button onClick={handlePrev} style={prevButtonStyle}>Atrás</button>
-              <button onClick={handleNext} style={nextButtonStyle(true)}>Siguiente</button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === 6 && (
-          <motion.div key={6} variants={campoVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <label style={{ fontWeight: 500 }}>Tiempo invertido (horas): {tiempo}</label>
-            <input type="range" min="0" max="8" value={tiempo} onChange={(e) => setTiempo(Number(e.target.value))} style={{ width: "100%", cursor: "pointer" }} />
-            <label style={{ fontWeight: 500, marginTop: "12px" }}>Nivel de comprensión: {comprension}%</label>
-            <input type="range" min="0" max="100" value={comprension} onChange={(e) => setComprension(Number(e.target.value))} style={{ width: "100%", cursor: "pointer" }} />
-
-            <div style={{ marginTop: "12px", display: "flex", gap: "8px", flexDirection: "column" }}>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button onClick={handlePrev} style={prevButtonStyle}>Atrás</button>
-                <button disabled={!formValido} onClick={handleSubmit} style={nextButtonStyle(!!formValido)}>Registrar avance</button>
+          <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ background: "#fff", padding: 16, borderRadius: 12 }}>
+              <h3>Tiempo & dificultad</h3>
+              <div style={{ marginBottom: 10 }}>
+                <label>Tiempo (horas)</label>
+                <input type="number" min="0" step="0.25" value={form.tiempo} onChange={(e) => onChange("tiempo", e.target.value)} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #eee" }} />
               </div>
-
-              <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-                  <input type="checkbox" checked={usoRecurso} onChange={(e) => setUsoRecurso(e.target.checked)} style={{ width: "18px", height: "18px" }} />
-                  Usé recurso externo
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-                  <input type="checkbox" checked={trabajoGrupo} onChange={(e) => setTrabajoGrupo(e.target.checked)} style={{ width: "18px", height: "18px" }} />
-                  Trabajo en grupo 👥
-                </label>
+              <div style={{ marginBottom: 10 }}>
+                <label>Dificultad: {form.dificultad}%</label>
+                <input type="range" min="0" max="100" value={form.dificultad} onChange={(e) => onChange("dificultad", e.target.value)} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label>Comprensión: {form.comprension}%</label>
+                <input type="range" min="0" max="100" value={form.comprension} onChange={(e) => onChange("comprension", e.target.value)} style={{ width: "100%" }} />
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
+
+            <div style={{ background: "#fff", padding: 16, borderRadius: 12 }}>
+              <h3>XP estimada</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, color: BRAND.primary }}>{xp} XP</div>
+              <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                <button onClick={guardarRegistro} style={{ flex: 1, background: BRAND.primary, color: "#fff", padding: 10, borderRadius: 8, border: "none", fontWeight: 700 }}>Guardar</button>
+                <button onClick={resetForm} style={{ padding: 10, borderRadius: 8, border: "1px solid #eee", background: "#fff" }}>Limpiar</button>
+              </div>
+
+              {savedMsg && <div style={{ marginTop: 12, padding: 8, borderRadius: 8, background: "#e9f8ed", color: "#1f6a36", fontWeight: 600 }}>{savedMsg}</div>}
+            </div>
+
+            <div style={{ background: "#fff", padding: 12, borderRadius: 12 }}>
+              <strong>Consejos</strong>
+              <ul style={{ marginTop: 8 }}>
+                <li>Registra la fecha real.</li>
+                <li>Incluye cómo lo hiciste para mejorar la retroalimentación.</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
   );
 }

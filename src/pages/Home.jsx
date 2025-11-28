@@ -45,8 +45,7 @@ export default function Home({ registros = [], stats }) {
           margin: "0 auto",
         }}
       >
-        {/* ❌❌❌ ELIMINADO: Barra de Progreso del Estudiante ❌❌❌ */}
-        {/* COMPLETAMENTE BORRADO POR PETICIÓN */}
+    
 
 
         {/* Resumen de progreso (SE MANTIENE IGUAL) */}
