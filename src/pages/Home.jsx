@@ -322,7 +322,7 @@ export default function Home({ registros = [], stats }) {
                             <div>
                               <strong>Trabajo en grupo:</strong>{" "}
                               {registro.trabajoGrupo ? "Sí" : "No"}
-                            </div>
+                            </div>o
                           </div>
                         )}
                       </div>

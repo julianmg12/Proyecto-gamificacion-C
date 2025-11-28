@@ -14,6 +14,8 @@ import AchievementsPage from "./pages/AchievementsPage";
 import SocialPage from "./pages/SocialPage";
 
 import { calculateStats } from "./utils/gamification";
+import NotificationProvider from "./components/NotificationProvider";
+import StatsNotifier from "./components/StatsNotifier";
 
 function App() {
   // Registros guardados en localStorage
@@ -37,39 +39,42 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        {/* Pantalla inicial -> Login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+      <NotificationProvider>
+        <StatsNotifier stats={stats} />
+        <Routes>
+          {/* Pantalla inicial -> Login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Pantalla principal (Mi registro) */}
-        <Route
-          path="/home"
-          element={<Home registros={registros} stats={stats} />}
-        />
+          {/* Pantalla principal (Mi registro) */}
+          <Route
+            path="/home"
+            element={<Home registros={registros} stats={stats} />}
+          />
 
-        {/* Página para registrar avance */}
-        <Route
-          path="/registro"
-          element={<RegistroPage onRegistrar={agregarRegistro} />}
-        />
+          {/* Página para registrar avance */}
+          <Route
+            path="/registro"
+            element={<RegistroPage onRegistrar={agregarRegistro} />}
+          />
 
-        {/* Página de logros (insignias, niveles, racha, ranking) */}
-        <Route
-          path="/logros"
-          element={<AchievementsPage stats={stats} />}
-        />
+          {/* Página de logros (insignias, niveles, racha, ranking) */}
+          <Route
+            path="/logros"
+            element={<AchievementsPage stats={stats} />}
+          />
 
-        {/* Página social (feed de avances) */}
-        <Route
-          path="/social"
-          element={<SocialPage registros={registros} />}
-        />
+          {/* Página social (feed de avances) */}
+          <Route
+            path="/social"
+            element={<SocialPage registros={registros} />}
+          />
 
-        {/* Cualquier otra ruta incorrecta vuelve al login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
+          {/* Cualquier otra ruta incorrecta vuelve al login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </NotificationProvider>
     </Router>
   );
 }
