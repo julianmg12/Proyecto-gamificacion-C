@@ -40,34 +40,28 @@ export default function NavBar() {
         borderTop: "1px solid #e0d5ff",
         display: "flex",
         gap: "0.5rem",
+        zIndex: 999,
       }}
     >
-      <NavLink
-        to="/home"
-        style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
-      >
+      <NavLink to="/home" style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}>
         Mi registro
       </NavLink>
 
-      <NavLink
-        to="/logros"
-        style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
-      >
+      <NavLink to="/logros" style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}>
         Mis logros
       </NavLink>
 
-      <NavLink
-        to="/social"
-        style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
-      >
+      <NavLink to="/social" style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}>
         Social
       </NavLink>
 
-      <NavLink
-        to="/graficos"
-        style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
-      >
+      <NavLink to="/graficos" style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}>
         Rendimiento
+      </NavLink>
+
+      {/* Nuevo botón Conexiones */}
+      <NavLink to="/connections" style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}>
+        Conexiones
       </NavLink>
     </nav>
   );
