@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import AddButton from "../components/AddButton";
-import NavBar from "../components/NavBar";
 import { getXPForRegistro } from "../utils/gamification";
 
 // Agrupa registros por día
@@ -332,7 +331,6 @@ export default function Home({ registros = [], stats }) {
         <AddButton onClick={() => navigate("/registro")} />
       </main>
 
-      <NavBar />
     </>
   );
 }

@@ -12,7 +12,6 @@ import GraficosPage from "./pages/GraficosPage";
 import ConnectionsPage from "./pages/ConnectionsPage";
 
 import Header from "./components/Header";
-import NavBar from "./components/NavBar";
 
 import { calculateStats } from "./utils/gamification";
 import NotificationProvider from "./components/NotificationProvider";
@@ -31,7 +30,6 @@ function AppLayout({ children }) {
       <main style={{ paddingTop: hideUI ? 0 : 72, paddingBottom: hideUI ? 0 : 84, minHeight: "calc(100vh - 72px)" }}>
         {children}
       </main>
-      {!hideUI && <NavBar />}
     </>
   );
 }

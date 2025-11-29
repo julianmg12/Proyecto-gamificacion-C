@@ -1,5 +1,3 @@
-import NavBar from "../components/NavBar";
-
 export default function AchievementsPage({ stats }) {
   const badges = stats?.badges ?? [];
 
@@ -195,7 +193,6 @@ export default function AchievementsPage({ stats }) {
         </section>
       </main>
 
-      <NavBar />
     </>
   );
 }

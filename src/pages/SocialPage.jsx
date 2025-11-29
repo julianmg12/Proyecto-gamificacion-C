@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 
-import NavBar from "../components/NavBar";
 
 export default function SocialPage({ registros = [] }) {
   const [likes, setLikes] = useState({});
@@ -467,7 +466,6 @@ export default function SocialPage({ registros = [] }) {
         )}
       </main>
 
-      <NavBar />
     </>
   );
 }
