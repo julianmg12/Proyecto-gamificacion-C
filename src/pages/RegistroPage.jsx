@@ -97,13 +97,6 @@ export default function RegistroPage({ onRegistrar }) {
     color: "#333",
   };
 
-  const skipBtn = {
-    ...button,
-    background: "transparent",
-    color: "#6541b5",
-    textDecoration: "underline",
-  };
-
   const campoVariants = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -111,10 +104,23 @@ export default function RegistroPage({ onRegistrar }) {
   };
 
   return (
+    <div 
+    style={{
+        margin: "0 auto",
+        maxWidth: "690px",
+        minWidth: "400px",
+        padding: "16px",
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+
     <main
       style={{
         margin: "0 auto",
-        maxWidth: "390px",
+        maxWidth: "690px",
+        minWidth: "400px",
         padding: "16px",
         minHeight: "67vh",
         display: "flex",
@@ -127,9 +133,7 @@ export default function RegistroPage({ onRegistrar }) {
       </h2>
 
       <AnimatePresence mode="wait">
-        {/* ────────────────────────────────
-           SECCIÓN 1 — DATOS OBLIGATORIOS
-        ───────────────────────────────── */}
+        {/*  SECCIÓN 1 — DATOS OBLIGATORIOS */}
         {step === 0 && (
           <motion.div
             key="step1"
@@ -173,9 +177,7 @@ export default function RegistroPage({ onRegistrar }) {
           </motion.div>
         )}
 
-        {/* ────────────────────────────────
-           SECCIÓN 2 — OPCIONALES
-        ───────────────────────────────── */}
+        {/* SECCIÓN 2 — OPCIONALES */}
         {step === 1 && (
           <motion.div
             key="step2"
@@ -211,9 +213,7 @@ export default function RegistroPage({ onRegistrar }) {
           </motion.div>
         )}
 
-        {/* ────────────────────────────────
-           SECCIÓN 3 — SLIDERS Y CHECKS
-        ───────────────────────────────── */}
+        {/* SECCIÓN 3 — SLIDERS Y CHECKS */}
         {step === 2 && (
           <motion.div
             key="step3"
@@ -284,5 +284,7 @@ export default function RegistroPage({ onRegistrar }) {
         )}
       </AnimatePresence>
     </main>
+
+    </div>
   );
 }
