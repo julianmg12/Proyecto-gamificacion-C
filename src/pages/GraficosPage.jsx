@@ -12,7 +12,6 @@ import {
   Legend,
 } from "chart.js";
 import NavBar from "../components/NavBar";
-import Header from "../components/Header";
 
 ChartJS.register(
   CategoryScale,
@@ -36,7 +35,6 @@ export default function GraficosPage() {
   if (registros.length === 0) {
     return (
       <>
-        <Header />
         <p style={{ textAlign: "center", marginTop: "30px" }}>
           No hay datos para mostrar.
         </p>
@@ -147,7 +145,6 @@ export default function GraficosPage() {
 
   return (
     <>
-      <Header />
 
       <main
         style={{
@@ -165,7 +162,7 @@ export default function GraficosPage() {
             textAlign: "center",
           }}
         >
-          Mis gráficos
+          Mis datos
         </h2>
 
         {/* GRID FIJO EN 2 COLUMNAS */}

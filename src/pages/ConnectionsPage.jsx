@@ -8,7 +8,16 @@ import FriendList from "../ui/FriendList";
 export default function ConnectionsPage() {
   return (
     <div style={{ padding: 20, maxWidth: 960, margin: "0 auto" }}>
-      <h1 style={{ color: "#2a007f" }}>Conexiones</h1>
+            <h2
+          style={{
+            marginBottom: "20px",
+            fontSize: "1.6rem",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
+        >
+          Mis contactos
+        </h2>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
         <div>
           <FriendSearch />

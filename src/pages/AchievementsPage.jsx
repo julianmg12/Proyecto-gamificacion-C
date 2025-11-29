@@ -1,4 +1,3 @@
-import Header from "../components/Header";
 import NavBar from "../components/NavBar";
 
 export default function AchievementsPage({ stats }) {
@@ -21,7 +20,6 @@ export default function AchievementsPage({ stats }) {
 
   return (
     <>
-      <Header stats={stats} />
 
       <main
         style={{

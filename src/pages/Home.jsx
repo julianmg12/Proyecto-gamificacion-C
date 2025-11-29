@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Header from "../components/Header";
 import AddButton from "../components/AddButton";
 import NavBar from "../components/NavBar";
 import { getXPForRegistro } from "../utils/gamification";
@@ -36,8 +35,6 @@ export default function Home({ registros = [], stats }) {
 
   return (
     <>
-      <Header stats={stats} />
-
       <main
         style={{
           padding: "1rem 1.5rem 4rem",

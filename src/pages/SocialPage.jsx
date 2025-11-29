@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
+
 import NavBar from "../components/NavBar";
 
 export default function SocialPage({ registros = [] }) {
@@ -82,8 +82,6 @@ export default function SocialPage({ registros = [] }) {
 
   return (
     <>
-      <Header />
-
       <main
         style={{
           padding: "1.2rem 1rem 5rem",
