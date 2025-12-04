@@ -20,16 +20,32 @@ export default function SocialPage({ registros = [] }) {
     localStorage.setItem("socialComments", JSON.stringify(comments));
   }, [comments]);
 
-  const handleLike = (idx) => {
-    setLikes((prev) => ({
+const handleLike = (idx) => {
+  setLikedPosts((prev) => {
+    const alreadyLiked = prev[idx];
+
+    // Si ya estaba con like → lo quitamos
+    if (alreadyLiked) {
+      setLikes((prevLikes) => ({
+        ...prevLikes,
+        [idx]: Math.max((prevLikes[idx] || 1) - 1, 0), // evita negativos
+      }));
+    } 
+    // Si NO estaba con like → lo agregamos
+    else {
+      setLikes((prevLikes) => ({
+        ...prevLikes,
+        [idx]: (prevLikes[idx] || 0) + 1,
+      }));
+    }
+
+    return {
       ...prev,
-      [idx]: (prev[idx] || 0) + 1,
-    }));
-    setLikedPosts((prev) => ({
-      ...prev,
-      [idx]: !prev[idx],
-    }));
-  };
+      [idx]: !alreadyLiked,
+    };
+  });
+};
+
 
   const handleAddComment = (idx) => {
     const text = commentInput[idx]?.trim();

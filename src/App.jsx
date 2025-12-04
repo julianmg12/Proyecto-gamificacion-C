@@ -26,7 +26,7 @@ function AppLayout({ children }) {
 
   return (
     <>
-      {!hideUI && <Header />}
+      {!hideUI && <Header/>}
       <main style={{ paddingTop: hideUI ? 0 : 72, paddingBottom: hideUI ? 0 : 84, minHeight: "calc(100vh - 72px)" }}>
         {children}
       </main>
