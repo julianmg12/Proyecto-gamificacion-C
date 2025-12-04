@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function RegistroPage({ onRegistrar }) {
   const navigate = useNavigate();
 
-  // --- ESTADOS ---
+  // --- ESTADOS ORIGINALES ---
   const [curso, setCurso] = useState("");
   const [proyecto, setProyecto] = useState("");
   const [queHice, setQueHice] = useState("");
@@ -18,6 +18,17 @@ export default function RegistroPage({ onRegistrar }) {
   const [comprension, setComprension] = useState(50);
   const [usoRecurso, setUsoRecurso] = useState(false);
   const [trabajoGrupo, setTrabajoGrupo] = useState(false);
+
+  // --- NUEVO: estado para pantalla final ---
+  const [mostrandoFinal, setMostrandoFinal] = useState(false);
+
+  // --- NUEVO: cursos dinámicos ---
+  const cursosIniciales = ["Programación I", "Bases de Datos", "IA", "Cálculo", "Nuevo curso..."];
+  const [listaCursos, setListaCursos] = useState(cursosIniciales);
+
+  // --- NUEVO: input flotante ---
+  const [addingCurso, setAddingCurso] = useState(false);
+  const [nuevoCursoNombre, setNuevoCursoNombre] = useState("");
 
   const [step, setStep] = useState(0);
   const totalSteps = 3;
@@ -36,6 +47,7 @@ export default function RegistroPage({ onRegistrar }) {
   const handleNext = () => step < totalSteps - 1 && setStep(step + 1);
   const handlePrev = () => step > 0 && setStep(step - 1);
 
+  // --- MODIFICADO: muestra pantalla final antes de navegar ---
   const handleSubmit = () => {
     const registroNuevo = {
       titulo: proyecto,
@@ -52,11 +64,14 @@ export default function RegistroPage({ onRegistrar }) {
       trabajoGrupo,
       fecha: new Date().toISOString(),
     };
+
     onRegistrar(registroNuevo);
-    navigate("/home");
+
+    setMostrandoFinal(true);
+    setTimeout(() => navigate("/home"), 2500);
   };
 
-  // --- ESTILOS GLOBALES ---
+  // --- ESTILOS ORIGINALES ---
   const containerStyle = {
     background: "#faf7ff",
     padding: "16px",
@@ -103,9 +118,62 @@ export default function RegistroPage({ onRegistrar }) {
     exit: { opacity: 0, y: -30 },
   };
 
+  const sliderShake =
+    dificultad > 80
+      ? { rotate: [0, -5, 5, 0], transition: { duration: 0.3 } }
+      : {};
+
+  const progress = ((step + 1) / totalSteps) * 100;
+
+  // --- SI ESTÁ MOSTRANDO PANTALLA FINAL ---
+  if (mostrandoFinal) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          textAlign: "center",
+          padding: "20px",
+        }}
+      >
+        <motion.div
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5 }}
+          style={{ fontSize: "4rem" }}
+        >
+          🎉
+        </motion.div>
+
+        <h2 style={{ marginTop: "10px" }}>¡Registro completado!</h2>
+        <p style={{ maxWidth: "300px", color: "#555" }}>
+          Tu avance fue guardado con éxito. ¡Sigue acumulando logros!
+        </p>
+
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: "200px" }}
+          transition={{ duration: 1 }}
+          style={{
+            height: "4px",
+            background: "#6541b5",
+            borderRadius: "4px",
+            marginTop: "20px",
+          }}
+        ></motion.div>
+      </motion.div>
+    );
+  }
+
+  // 🌟 UI PRINCIPAL
   return (
-    <div 
-    style={{
+    <div
+      style={{
         margin: "0 auto",
         maxWidth: "690px",
         minWidth: "400px",
@@ -115,176 +183,308 @@ export default function RegistroPage({ onRegistrar }) {
         alignItems: "center",
       }}
     >
+      <main
+        style={{
+          margin: "0 auto",
+          maxWidth: "690px",
+          minWidth: "400px",
+          padding: "16px",
+          minHeight: "67vh",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+        }}
+      >
 
-    <main
-      style={{
-        margin: "0 auto",
-        maxWidth: "690px",
-        minWidth: "400px",
-        padding: "16px",
-        minHeight: "67vh",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-      }}
-    >
-      <h2 style={{ margin: "0 0 10px 0", fontSize: "1.35rem", fontWeight: "bold" }}>
-        Registrar avance
-      </h2>
+        <h2 style={{ margin: "0 0 10px 0", fontSize: "1.35rem", fontWeight: "bold" }}>
+          Registrar avance
+        </h2>
 
-      <AnimatePresence mode="wait">
-        {/*  SECCIÓN 1 — DATOS OBLIGATORIOS */}
-        {step === 0 && (
+        {/* BARRA DE PROGRESO */}
+        <div
+          style={{
+            height: "6px",
+            width: "100%",
+            background: "#e5d9ff",
+            borderRadius: "8px",
+            overflow: "hidden",
+            marginBottom: "6px",
+          }}
+        >
           <motion.div
-            key="step1"
-            variants={campoVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.25 }}
-            style={containerStyle}
-          >
-            <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Información básica</h3>
+            style={{ height: "100%", background: "#6541b5" }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
 
-            <label>Curso</label>
-            <input
-              style={inputStyle}
-              type="text"
-              value={curso}
-              onChange={(e) => setCurso(e.target.value)}
-            />
+        <AnimatePresence mode="wait">
 
-            <label>Tarea / Proyecto</label>
-            <input
-              style={inputStyle}
-              type="text"
-              value={proyecto}
-              onChange={(e) => setProyecto(e.target.value)}
-            />
+          {/* STEP 1 ---------------------------------------------------------------- */}
+          {step === 0 && (
+            <motion.div
+              key="step1"
+              variants={campoVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+              style={containerStyle}
+            >
+              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Información básica</h3>
 
-            <label>¿Qué hice?</label>
-            <textarea
-              style={{ ...inputStyle, minHeight: "80px" }}
-              value={queHice}
-              onChange={(e) => setQueHice(e.target.value)}
-            />
+              {/* TARJETAS DE CURSOS */}
+              <label>Curso</label>
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
-              <button disabled={!formValido} onClick={handleNext} style={nextBtn(formValido)}>
-                Siguiente
-              </button>
-            </div>
-          </motion.div>
-        )}
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {listaCursos.map((c) => (
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    key={c}
+                    onClick={() => {
+                      if (c === "Nuevo curso...") {
+                        setAddingCurso(true);
+                      } else {
+                        setCurso(c);
+                      }
+                    }}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: "10px",
+                      border: curso === c ? "2px solid #6541b5" : "1px solid #ccc",
+                      background: curso === c ? "#ece3ff" : "white",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {c}
+                  </motion.div>
+                ))}
 
-        {/* SECCIÓN 2 — OPCIONALES */}
-        {step === 1 && (
-          <motion.div
-            key="step2"
-            variants={campoVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.25 }}
-            style={containerStyle}
-          >
-            <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Detalles opcionales</h3>
+                {/* INPUT FLOTANTE PARA NUEVO CURSO */}
+                <AnimatePresence>
+                  {addingCurso && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        display: "flex",
+                        gap: "6px",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        border: "2px solid #6541b5",
+                        background: "#f5efff",
+                        width: "100%",
+                      }}
+                    >
+                      <input
+                        autoFocus
+                        placeholder="Nombre del curso"
+                        value={nuevoCursoNombre}
+                        onChange={(e) => setNuevoCursoNombre(e.target.value)}
+                        style={{
+                          flex: 1,
+                          padding: "8px",
+                          borderRadius: "6px",
+                          border: "1px solid #ccc",
+                          fontSize: "0.9rem",
+                        }}
+                      />
 
-            <label>¿Cómo lo hice? (opcional)</label>
-            <textarea
-              style={{ ...inputStyle, minHeight: "80px" }}
-              value={comoHice}
-              onChange={(e) => setComoHice(e.target.value)}
-            />
+                      <button
+                        onClick={() => {
+                          if (!nuevoCursoNombre.trim()) return;
 
-            <label>Recurso o enlace (opcional)</label>
-            <input
-              style={inputStyle}
-              type="text"
-              value={recurso}
-              onChange={(e) => setRecurso(e.target.value)}
-            />
+                          setListaCursos([
+                            ...listaCursos.filter((c) => c !== "Nuevo curso..."),
+                            nuevoCursoNombre,
+                            "Nuevo curso...",
+                          ]);
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
-              <button onClick={handlePrev} style={backBtn}>Atrás</button>
-              <button onClick={handleNext} style={nextBtn(true)}>Siguiente</button>
-            </div>
+                          setCurso(nuevoCursoNombre);
+                          setNuevoCursoNombre("");
+                          setAddingCurso(false);
+                        }}
+                        style={{
+                          background: "#6541b5",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          padding: "0 12px",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        ✓
+                      </button>
 
-          </motion.div>
-        )}
+                      <button
+                        onClick={() => {
+                          setNuevoCursoNombre("");
+                          setAddingCurso(false);
+                        }}
+                        style={{
+                          background: "#eee",
+                          color: "#333",
+                          border: "none",
+                          borderRadius: "6px",
+                          padding: "0 10px",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-        {/* SECCIÓN 3 — SLIDERS Y CHECKS */}
-        {step === 2 && (
-          <motion.div
-            key="step3"
-            variants={campoVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.25 }}
-            style={containerStyle}
-          >
-            <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Esfuerzo y comprensión</h3>
-
-            <label>
-              Dificultad: {emojiActual} {dificultad}%
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={dificultad}
-              onChange={(e) => setDificultad(Number(e.target.value))}
-              style={{ width: "100%" }}
-            />
-
-            <label>Tiempo invertido (horas): {tiempo}</label>
-            <input
-              type="range"
-              min="0"
-              max="8"
-              value={tiempo}
-              onChange={(e) => setTiempo(Number(e.target.value))}
-              style={{ width: "100%" }}
-            />
-
-            <label>Comprensión: {comprension}%</label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={comprension}
-              onChange={(e) => setComprension(Number(e.target.value))}
-              style={{ width: "100%" }}
-            />
-
-            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <label>Tarea / Proyecto</label>
               <input
-                type="checkbox"
-                checked={usoRecurso}
-                onChange={(e) => setUsoRecurso(e.target.checked)}
+                style={inputStyle}
+                type="text"
+                value={proyecto}
+                onChange={(e) => setProyecto(e.target.value)}
               />
-              Usé recursos externos
-            </label>
 
-            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <label>¿Qué hice?</label>
+              <textarea
+                style={{ ...inputStyle, minHeight: "80px" }}
+                value={queHice}
+                onChange={(e) => setQueHice(e.target.value)}
+              />
+
+              <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
+                <button disabled={!formValido} onClick={handleNext} style={nextBtn(formValido)}>
+                  Siguiente
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ---------------------------------------------------------------------- */}
+          {/* STEP 2 */}
+          {step === 1 && (
+            <motion.div
+              key="step2"
+              variants={campoVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+              style={containerStyle}
+            >
+              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Detalles opcionales</h3>
+
+              <label>¿Cómo lo hice? (opcional)</label>
+              <textarea
+                style={{ ...inputStyle, minHeight: "80px" }}
+                value={comoHice}
+                onChange={(e) => setComoHice(e.target.value)}
+              />
+
+              <label>Recurso o enlace (opcional)</label>
               <input
-                type="checkbox"
-                checked={trabajoGrupo}
-                onChange={(e) => setTrabajoGrupo(e.target.checked)}
+                style={inputStyle}
+                type="text"
+                value={recurso}
+                onChange={(e) => setRecurso(e.target.value)}
               />
-              Trabajo en grupo 👥
-            </label>
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
-              <button onClick={handlePrev} style={backBtn}>Atrás</button>
-              <button onClick={handleSubmit} style={nextBtn(true)}>Registrar</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
+              <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
+                <button onClick={handlePrev} style={backBtn}>
+                  Atrás
+                </button>
+                <button onClick={handleNext} style={nextBtn(true)}>
+                  Siguiente
+                </button>
+              </div>
+            </motion.div>
+          )}
 
+          {/* ---------------------------------------------------------------------- */}
+          {/* STEP 3 */}
+          {step === 2 && (
+            <motion.div
+              key="step3"
+              variants={campoVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+              style={containerStyle}
+            >
+              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Esfuerzo y comprensión</h3>
+
+              {/* Slider */}
+              <motion.div animate={sliderShake}>
+                <label>
+                  Dificultad: {emojiActual} {dificultad}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={dificultad}
+                  onChange={(e) => setDificultad(Number(e.target.value))}
+                  style={{ width: "100%" }}
+                />
+              </motion.div>
+
+              <label>Tiempo invertido (horas): {tiempo}</label>
+              <input
+                type="range"
+                min="0"
+                max="8"
+                value={tiempo}
+                onChange={(e) => setTiempo(Number(e.target.value))}
+                style={{ width: "100%" }}
+              />
+
+              <label>Comprensión: {comprension}%</label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={comprension}
+                onChange={(e) => setComprension(Number(e.target.value))}
+                style={{ width: "100%" }}
+              />
+
+              <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <input
+                  type="checkbox"
+                  checked={usoRecurso}
+                  onChange={(e) => setUsoRecurso(e.target.checked)}
+                />
+                Usé recursos externos
+              </label>
+
+              <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <input
+                  type="checkbox"
+                  checked={trabajoGrupo}
+                  onChange={(e) => setTrabajoGrupo(e.target.checked)}
+                />
+                Trabajo en grupo 👥
+              </label>
+
+              <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
+                <button onClick={handlePrev} style={backBtn}>
+                  Atrás
+                </button>
+                <button onClick={handleSubmit} style={nextBtn(true)}>
+                  Registrar
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </div>
   );
 }

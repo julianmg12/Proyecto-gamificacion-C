@@ -1,10 +1,8 @@
 import { useNavigate, NavLink } from "react-router-dom";
 
-export default function Header({ stats }) {
+export default function Header() {
   const navigate = useNavigate();
 
-  const totalXP = stats?.totalXP ?? 0;
-  const levelName = stats?.levelName ?? "Novato";
 
   const baseNav = {
     flex: 1,
@@ -71,10 +69,6 @@ export default function Header({ stats }) {
               minWidth: "110px",
             }}
           >
-            <div style={{ fontWeight: 600, color: "#2a007f" }}>
-              Nivel: {levelName}
-            </div>
-            <div style={{ color: "#4f3c7a" }}>XP: {totalXP}</div>
           </div>
 
           <button
